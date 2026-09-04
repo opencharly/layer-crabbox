@@ -1,0 +1,126 @@
+# layer-crabbox — the Crabbox CLI candy
+#
+# One candy: `crabbox` installs the pinned Crabbox CLI binary and composes the
+# CLI's laptop prerequisites (git/ssh/ssh-keygen/rsync/curl) from sibling
+# candies instead of re-shipping them (R3). Root-entity repo (pod-openclaw
+# shape): entities live at the repo root; no discover: block needed.
+version: 2026.232.0520
+crabbox:
+    candy:
+        version: 2026.247.0100
+        description: |
+            The Crabbox CLI — lease, sync, run, stream, and release remote test
+            execution (https://github.com/openclaw/crabbox). Installs the single
+            static `crabbox` binary from the pinned GoReleaser release archive to
+            /usr/local/bin/crabbox, and composes the CLI's laptop prerequisites
+            instead of re-shipping them (R3): git via layer-gh, ssh/ssh-keygen via
+            layer-ssh-client, plus rsync/curl packages. The observable, verifiable
+            effect — the binary at a fixed path, `crabbox --version` reporting the
+            pinned release, the credential-free `crabbox providers` matrix, and a
+            broker-less `crabbox doctor` pass — is exactly what the plan block
+            asserts; a missing download or a broken binary fails the checks.
+        var:
+            CRABBOX_VERSION: "0.48.1"
+        require:
+            - '@github.com/opencharly/layer-gh:v2026.239.1624'
+            - '@github.com/opencharly/layer-ssh-client:v2026.239.1629'
+        package:
+            - rsync
+            - curl
+        alias:
+            - name: crabbox
+              command: crabbox
+        plan:
+            - run: download the pinned crabbox release archive and install the single binary to /usr/local/bin
+              download: "https://github.com/openclaw/crabbox/releases/download/v${CRABBOX_VERSION}/crabbox_${CRABBOX_VERSION}_linux_${ARCH}.tar.gz"
+              extract: tar.gz
+              to: /usr/local/bin
+              extract_include: [crabbox]
+              run_as: root
+            - check: the crabbox CLI binary is installed at /usr/local/bin/crabbox
+              file:
+                file: /usr/local/bin/crabbox
+                exists: true
+            - check: crabbox --version reports the pinned 0.48.1 release on stdout
+              exit_status: 0
+              stdout:
+                - matches: "0\\.48\\.1"
+              command: /usr/local/bin/crabbox --version
+            - check: crabbox providers lists the credential-free local provider matrix
+              exit_status: 0
+              stdout:
+                - contains: "local-container"
+              command: /usr/local/bin/crabbox providers
+            - check: crabbox doctor passes in a broker-less context (local prerequisites only)
+              exit_status: 0
+              command: /usr/local/bin/crabbox doctor
+crabbox-skill:
+    skill:
+        name: crabbox
+        family: tools
+        owner: crabbox
+        description: |-
+            The Crabbox CLI candy — remote software testing and execution control
+            plane (lease/sync/run/job/stop over SSH-leased or delegated runners).
+            Use when composing the crabbox CLI into a box, choosing the local
+            provider surface (local-container/static-ssh/external), or verifying a
+            crabbox installation.
+        content: |-
+            # crabbox
+
+            ## Candy Properties
+
+            | Property | Value |
+            |----------|-------|
+            | Binary | `/usr/local/bin/crabbox` |
+            | Version | pinned `0.48.1` (GoReleaser release archive, `CRABBOX_VERSION` var) |
+            | Install | `download:` the release tarball, `extract_include: [crabbox]` |
+            | Requires | `layer-gh` (git), `layer-ssh-client` (ssh/ssh-keygen), rsync + curl packages |
+            | Alias | `crabbox` (wrapper runs in-box via `charly alias`) |
+
+            ## What it installs
+
+            A single static Go binary, `crabbox`, downloaded from the pinned
+            openclaw/crabbox GitHub release
+            (`crabbox_${CRABBOX_VERSION}_linux_${ARCH}.tar.gz` — the asset name is
+            `v`-less while the download tag is `v`-prefixed). Prerequisites for the
+            CLI's lease/sync machinery (git, ssh, ssh-keygen, rsync, curl) come
+            from composed candies/packages — never re-shipped.
+
+            ## Verification
+
+            The candy's `plan:` ships deterministic `check:` steps: the binary
+            lands at `/usr/local/bin/crabbox`, `crabbox --version` reports the
+            pinned release, `crabbox providers` lists the credential-free local
+            provider matrix (local-container / ssh / external), and `crabbox
+            doctor` passes in a broker-less build context.
+
+            ## Local provider surface (no cloud credentials)
+
+            | Provider | Notes |
+            |----------|-------|
+            | `local-container` (aliases `docker`/`container`/`local-docker`) | SSH leases as local container (Podman/Docker); sync/run/logs/artifacts + `--desktop`/`--browser` capabilities |
+            | `ssh` (`static`/`static-ssh`) | existing machines |
+            | `external` (`exec-provider`) | an executable implementing the crabbox provider protocol |
+            | cloud (aws/azure/gcp/hetzner/daytona/…) | direct modes with operator credentials; documented-only |
+
+            ## Install on a dev host / box
+
+            ```bash
+            charly fleet add crabbox crabbox --target local   # installs /usr/local/bin/crabbox
+            charly alias install <box>                        # alias wrapper
+            crabbox doctor
+            ```
+
+            ## Cross-References
+
+            - `/charly-tools:cue` — the sibling binary-download candy (same pattern).
+            - `/charly-build:build` — box build (the download/extract path).
+            - `/charly-check:check` — plan authoring + ADE.
+            - Upstream [Crabbox](https://github.com/openclaw/crabbox) + its own
+              `skills/crabbox` agent skill (referenced, not duplicated — R3).
+
+            ## When to Use This Skill
+
+            Invoke when composing the crabbox CLI into a box, deciding the local
+            provider surface, or verifying a crabbox installation.
