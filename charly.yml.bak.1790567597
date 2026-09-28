@@ -4,8 +4,10 @@
 # CLI's laptop prerequisites (git/ssh/ssh-keygen/rsync/curl) from sibling
 # candies instead of re-shipping them (R3). Root-entity repo (pod-openclaw
 # shape): entities live at the repo root; no discover: block needed.
+version: 2026.240.1943
 crabbox:
     candy:
+        version: 2026.250.0300
         description: |
             The Crabbox CLI — lease, sync, run, stream, and release remote test
             execution (https://github.com/openclaw/crabbox). Installs the single
