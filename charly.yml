@@ -20,8 +20,8 @@ crabbox:
         var:
             CRABBOX_VERSION: "0.51.0"
         require:
-            - '@github.com/opencharly/layer-gh:v2026.239.1624'
-            - '@github.com/opencharly/layer-ssh-client:v2026.239.1629'
+            - '@github.com/opencharly/layer-gh:v2026.272.0136'
+            - '@github.com/opencharly/layer-ssh-client:v2026.272.0430'
         package:
             - rsync
             - curl
