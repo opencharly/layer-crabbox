@@ -42,7 +42,7 @@ crabbox:
             - check: crabbox --version reports the pinned 0.78.0 release on stdout
               exit_status: 0
               stdout:
-                - matches: "0\\.51\\.0"
+                - matches: "0\\.78\\.0"
               command: /usr/local/bin/crabbox --version
             - check: crabbox providers lists the credential-free local provider matrix
               exit_status: 0
