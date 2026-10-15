@@ -61,3 +61,24 @@ so a missing download or a broken binary fails the checks.
 - Upstream: [openclaw/crabbox](https://github.com/openclaw/crabbox)
 - [`opencharly/charly`](https://github.com/opencharly/charly) — the charly CLI and image builder
 - [`opencharly/opencharly`](https://github.com/opencharly/opencharly) — the umbrella
+
+## Deliberate narrowing: the runtime pack is not installed
+
+The install extracts **only the `crabbox` binary** from the release archive
+(`extract_include: [crabbox]` in `charly.yml`). Upstream's archive also carries a
+**native runtime pack** — CLI-side command-supervision companions that let `crabbox` run
+commands on a Linux target **without Bash**:
+
+> "Complete installations now include a native runtime pack. … the Linux companions let
+> independent Linux and WSL2 SSH commands run without Bash." — upstream `CHANGELOG` at `v0.78.0`
+
+That is deliberate here, and the cost is bounded: **every box this candy composes into
+ships Bash** (Fedora, Arch, Debian, Ubuntu, CachyOS), so the narrowed install is
+sufficient for leasing containers and driving a local coordinator. A **Bash-less Linux
+target** — WSL2, a minimal or Alpine guest, a Bash-less runner — would need the full pack
+for independent argv execution, and `crabbox --preflight --preflight-tools default,bash`
+reports the absent state there.
+
+Recorded because the narrowing is invisible in `charly.yml` unless you know what the
+archive carries, and because the pack's absence is otherwise indistinguishable from a
+failure on such a target.
