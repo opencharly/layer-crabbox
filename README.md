@@ -16,7 +16,7 @@ via `layer-ssh-client`, plus the `rsync` and `curl` packages.
 |---|---|
 | Layer / candy | `crabbox` |
 | Binary | `/usr/local/bin/crabbox` |
-| Version | pinned `0.51.0` (`CRABBOX_VERSION` var; GoReleaser release archive) |
+| Version | pinned `0.78.0` (`CRABBOX_VERSION` var; GoReleaser release archive) |
 | Requires | `layer-gh` (git), `layer-ssh-client` (ssh/ssh-keygen), `rsync`, `curl` |
 | Alias | `crabbox` |
 | Service / port | none |
@@ -30,13 +30,13 @@ my-box:
   candy:
     base: fedora
     candy:
-      - '@github.com/opencharly/layer-crabbox:v2026.250.1023'
+      - '@github.com/opencharly/layer-crabbox:v2026.287.2338'
 ```
 
 Then, inside the built image (or on a dev host via the `charly alias` wrapper):
 
 ```bash
-crabbox --version       # reports the pinned 0.51.0 release
+crabbox --version       # reports the pinned 0.78.0 release
 crabbox providers       # the credential-free local provider matrix
 crabbox doctor          # passes with local prerequisites only
 ```
