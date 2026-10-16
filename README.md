@@ -56,7 +56,7 @@ so a missing download or a broken binary fails the checks.
 
 ## Related
 
-- Owning skill: `/charly-tools:crabbox`
+- Owning skill: `/charly-tools:crabbox-cli`
 - Sibling binary-download candy: `/charly-tools:cue`
 - Upstream: [openclaw/crabbox](https://github.com/openclaw/crabbox)
 - [`opencharly/charly`](https://github.com/opencharly/charly) — the charly CLI and image builder

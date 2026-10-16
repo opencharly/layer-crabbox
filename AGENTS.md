@@ -4,7 +4,7 @@ Standalone candy repo for the `crabbox` layer — the pinned Crabbox CLI plus it
 laptop prerequisites. The candy lives in `charly.yml` at the repo root: the
 `CRABBOX_VERSION` var, the `require:` deps, the `download:`/extract `plan:`
 steps, the `check:` assertions, and the embedded `skill:` entity projected into
-the marketplace corpus as `/charly-tools:crabbox`.
+the marketplace corpus as `/charly-tools:crabbox-cli`.
 
 Canonical files:
 
@@ -14,7 +14,7 @@ Canonical files:
 
 ## Load these skills first (R0)
 
-- `/charly-tools:crabbox` — the owning skill. The pinned release, the composed
+- `/charly-tools:crabbox-cli` — the owning skill. The pinned release, the composed
   prerequisites, and the credential-free local provider surface. Load before
   editing or troubleshooting the candy.
 - `/charly-image:layer` — the candy authoring reference (`charly.yml` schema,

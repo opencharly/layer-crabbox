@@ -54,7 +54,7 @@ crabbox:
               command: /usr/local/bin/crabbox doctor
 crabbox-skill:
     skill:
-        name: crabbox
+        name: crabbox-cli
         family: tools
         owner: crabbox
         description: |-
@@ -64,7 +64,7 @@ crabbox-skill:
             provider surface (local-container/static-ssh/external), or verifying a
             crabbox installation.
         content: |-
-            # crabbox
+            # crabbox-cli
 
             ## Candy Properties
 
