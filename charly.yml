@@ -63,6 +63,11 @@ crabbox-skill:
             Use when composing the crabbox CLI into a box, choosing the local
             provider surface (local-container/static-ssh/external), or verifying a
             crabbox installation.
+        category: images
+        triggers:
+            - "the Crabbox CLI candy / composing `crabbox` into a box"
+            - "choosing a credential-free crabbox provider surface (local-container / static-ssh / external)"
+            - "verifying or troubleshooting a crabbox installation"
         content: |-
             # crabbox-cli
 
