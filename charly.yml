@@ -18,7 +18,7 @@ crabbox:
             broker-less `crabbox doctor` pass — is exactly what the plan block
             asserts; a missing download or a broken binary fails the checks.
         var:
-            CRABBOX_VERSION: "0.78.0"
+            CRABBOX_VERSION: "0.79.0"
         require:
             - '@github.com/opencharly/layer-gh:v2026.272.0136'
             - '@github.com/opencharly/layer-ssh-client:v2026.272.0430'
@@ -39,10 +39,10 @@ crabbox:
               file:
                 file: /usr/local/bin/crabbox
                 exists: true
-            - check: crabbox --version reports the pinned 0.78.0 release on stdout
+            - check: crabbox --version reports the pinned 0.79.0 release on stdout
               exit_status: 0
               stdout:
-                - matches: "0\\.78\\.0"
+                - matches: "0\\.79\\.0"
               command: /usr/local/bin/crabbox --version
             - check: crabbox providers lists the credential-free local provider matrix
               exit_status: 0
@@ -57,6 +57,10 @@ crabbox-skill:
         name: crabbox-cli
         family: tools
         owner: crabbox
+        triggers:
+            - "crabbox CLI / crabbox binary / crabbox version / installing or verifying the CLI"
+            - "composing the crabbox CLI candy into a box or choosing its provider surface"
+        category: commands
         description: |-
             The Crabbox CLI candy — remote software testing and execution control
             plane (lease/sync/run/job/stop over SSH-leased or delegated runners).
@@ -76,7 +80,7 @@ crabbox-skill:
             | Property | Value |
             |----------|-------|
             | Binary | `/usr/local/bin/crabbox` |
-            | Version | pinned `0.78.0` (GoReleaser release archive, `CRABBOX_VERSION` var) |
+            | Version | pinned `0.79.0` (GoReleaser release archive, `CRABBOX_VERSION` var) |
             | Install | `download:` the release tarball, `extract_include: [crabbox]` |
             | Requires | `layer-gh` (git), `layer-ssh-client` (ssh/ssh-keygen), rsync + curl packages |
             | Alias | `crabbox` (wrapper runs in-box via `charly alias`) |
@@ -107,7 +111,7 @@ crabbox-skill:
             Opt out of the explicit lease hostname for runtimes that share the
             host UTS namespace via `localContainer.noHostname: true` in
             `~/.config/crabbox/config.yaml` (or
-            `CRABBOX_LOCAL_CONTAINER_NO_HOSTNAME=1`) — the v0.78.0 surface
+            `CRABBOX_LOCAL_CONTAINER_NO_HOSTNAME=1`) — the v0.79.0 surface
             (upstream #1813/#1924); a fixed lease ID conflicts when the setting
             changes between acquisitions.
             | `ssh` (`static`/`static-ssh`) | existing machines |

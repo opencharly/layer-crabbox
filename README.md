@@ -16,7 +16,7 @@ via `layer-ssh-client`, plus the `rsync` and `curl` packages.
 |---|---|
 | Layer / candy | `crabbox` |
 | Binary | `/usr/local/bin/crabbox` |
-| Version | pinned `0.78.0` (`CRABBOX_VERSION` var; GoReleaser release archive) |
+| Version | pinned `0.79.0` (`CRABBOX_VERSION` var; GoReleaser release archive) |
 | Requires | `layer-gh` (git), `layer-ssh-client` (ssh/ssh-keygen), `rsync`, `curl` |
 | Alias | `crabbox` |
 | Service / port | none |
@@ -36,7 +36,7 @@ my-box:
 Then, inside the built image (or on a dev host via the `charly alias` wrapper):
 
 ```bash
-crabbox --version       # reports the pinned 0.78.0 release
+crabbox --version       # reports the pinned 0.79.0 release
 crabbox providers       # the credential-free local provider matrix
 crabbox doctor          # passes with local prerequisites only
 ```
@@ -70,7 +70,7 @@ The install extracts **only the `crabbox` binary** from the release archive
 commands on a Linux target **without Bash**:
 
 > "Complete installations now include a native runtime pack. … the Linux companions let
-> independent Linux and WSL2 SSH commands run without Bash." — upstream `CHANGELOG` at `v0.78.0`
+> independent Linux and WSL2 SSH commands run without Bash." — upstream `CHANGELOG` at `v0.79.0`
 
 That is deliberate here, and the cost is bounded: **every box this candy composes into
 ships Bash** (Fedora, Arch, Debian, Ubuntu, CachyOS), so the narrowed install is
