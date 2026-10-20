@@ -57,6 +57,10 @@ crabbox-skill:
         name: crabbox-cli
         family: tools
         owner: crabbox
+        triggers:
+            - "crabbox CLI / crabbox binary / crabbox version / installing or verifying the CLI"
+            - "composing the crabbox CLI candy into a box or choosing its provider surface"
+        category: commands
         description: |-
             The Crabbox CLI candy — remote software testing and execution control
             plane (lease/sync/run/job/stop over SSH-leased or delegated runners).
