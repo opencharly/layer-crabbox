@@ -2,7 +2,7 @@
 #
 # A SEPARATE candy from the CLI so a consumer opts in: a box that only wants the
 # `crabbox` binary does not silently inherit a `provider:` default. Referenced by
-# path (`@github.com/opencharly/layer-crabbox/candy/crabbox-containerd-config:<tag>`),
+# path (`@github.com/opencharly/layer-crabbox/crabbox-containerd-config:<tag>`),
 # the same way plugin candies are referenced, so the root `crabbox` ref keeps its
 # existing meaning for every current consumer.
 #
@@ -27,7 +27,7 @@ crabbox-containerd-config:
         # The check runs the CLI, so the CLI is a real dependency edge — composing this
         # candy alone must not fail for a missing binary (the bed composing both hid it).
         require:
-            - crabbox
+            - layer-crabbox
         plan:
             - run: render the crabbox user config selecting the containerd provider and its lease image
               config: "${HOME}/.config/crabbox/config.yaml"

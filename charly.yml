@@ -1,16 +1,25 @@
+# NO `candy/` directory at this repo root, deliberately: a repo carrying candy/
+# is scanned as a PROJECT (candies keyed `repo/candy/<name>`), so a remote
+# `@github.com/opencharly/layer-crabbox:<tag>` ref would never resolve the ROOT
+# candy and every consumer failed "unknown candy github.com/opencharly/layer-crabbox"
+# (MEASURED on v2026.296.1108). Without candy/, the root manifest is scanned as
+# the single candy named after the repo (`layer-crabbox`). The root manifest is
+# the project's OWN file, so no `path: "."` is needed; the separate config candy
+# lives in its own named directory and is referenced by path
+# (`@.../layer-crabbox/crabbox-containerd-config:<tag>`).
 discover:
-    - path: candy
+    - path: crabbox-containerd-config
       recursive: true
     - path: box
       recursive: true
 
 # layer-crabbox — the Crabbox CLI candy
 #
-# The root entity `crabbox` BUILDS the CLI from the pinned opencharly/crabbox
+# The root entity `layer-crabbox` BUILDS the CLI from the pinned opencharly/crabbox
 # commit (the fork that carries the `containerd` SSH-lease provider) and composes
 # the CLI's laptop prerequisites (git/ssh/ssh-keygen/rsync/curl) from sibling
 # candies instead of re-shipping them (R3). The separate
-# `candy/crabbox-containerd-config` entity renders the containerd provider
+# `crabbox-containerd-config` entity renders the containerd provider
 # selection; `box/check-crabbox-cli` is the R10 witness.
 #
 # Why a source build: the upstream GoReleaser releases under `openclaw/crabbox`
@@ -20,7 +29,7 @@ discover:
 # pinned source tarball, the `layer-golang` toolchain, CGO disabled, the module
 # and build caches mounted. The version string is injected from the pin so the
 # binary reports the exact commit it was built from.
-crabbox:
+layer-crabbox:
     candy:
         description: |
             The Crabbox CLI — lease, sync, run, stream, and release remote test
@@ -108,7 +117,7 @@ crabbox-skill:
     skill:
         name: crabbox-cli
         family: tools
-        owner: crabbox
+        owner: layer-crabbox
         triggers:
             - "crabbox CLI / crabbox binary / crabbox version / installing or verifying the CLI"
             - "composing the crabbox CLI candy into a box or choosing its provider surface"
