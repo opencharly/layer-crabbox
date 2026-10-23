@@ -1,0 +1,47 @@
+# crabbox-containerd-config — the containerd provider selection for the CLI.
+#
+# A SEPARATE candy from the CLI so a consumer opts in: a box that only wants the
+# `crabbox` binary does not silently inherit a `provider:` default. Referenced by
+# path (`@github.com/opencharly/layer-crabbox/candy/crabbox-containerd-config:<tag>`),
+# the same way plugin candies are referenced, so the root `crabbox` ref keeps its
+# existing meaning for every current consumer.
+#
+# The config is rendered through the `config:` verb + the vendored `crabbox-yaml`
+# CUE schema (plugin-egress), the same shape `plugin-crabbox`'s firecracker-config
+# step and the nesting DNS candy use — never a hand-written heredoc (R3).
+crabbox-containerd-config:
+    candy:
+        description: |
+            The containerd provider selection for the Crabbox CLI: renders
+            `~/.config/crabbox/config.yaml` with `provider: containerd` and
+            `containerd.image: <the pod-crabbox lease image>`, through the
+            `config:` verb so the rendered bytes are validated against the
+            vendored `crabbox-yaml` CUE schema. The observable effect — a file the
+            CLI parses and reports through `crabbox config show` — is what the
+            plan asserts. Point `CRABBOX_CONTAINERD_IMAGE` at the image the host
+            is meant to lease; the default names the W5 `pod-crabbox` image at its
+            currently-newest tag, and a host that has no such image fails the
+            lease with that exact ref rather than an ambient default.
+        var:
+            CRABBOX_CONTAINERD_IMAGE: "ghcr.io/opencharly/pod-crabbox:2026.293.1655"
+        plan:
+            - run: render the crabbox user config selecting the containerd provider and its lease image
+              config: "${HOME}/.config/crabbox/config.yaml"
+              mode: "0600"
+              validate: crabbox-yaml
+              content: |
+                  provider: containerd
+                  containerd:
+                      image: ${CRABBOX_CONTAINERD_IMAGE}
+              run_as: "${USER}"
+            - check: the crabbox config file exists
+              file:
+                file: "${HOME}/.config/crabbox/config.yaml"
+                exists: true
+                filetype: file
+            - check: crabbox config show reports the containerd provider and the lease image from the rendered file
+              exit_status: 0
+              stdout:
+                - contains: "containerd"
+                - contains: "ghcr.io/opencharly/pod-crabbox"
+              command: /usr/local/bin/crabbox config show

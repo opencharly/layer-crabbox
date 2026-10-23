@@ -1,45 +1,64 @@
 # AGENTS.md — layer-crabbox
 
-Standalone candy repo for the `crabbox` layer — the pinned Crabbox CLI plus its
-laptop prerequisites. The candy lives in `charly.yml` at the repo root: the
-`CRABBOX_VERSION` var, the `require:` deps, the `download:`/extract `plan:`
-steps, the `check:` assertions, and the embedded `skill:` entity projected into
-the marketplace corpus as `/charly-tools:crabbox-cli`.
+Standalone candy repo for the `crabbox` layer — the pinned Crabbox CLI, BUILT from
+the `opencharly/crabbox` source at a pinned commit, plus its laptop prerequisites
+and (as a separate candy) the containerd provider config.
 
 Canonical files:
 
-- `charly.yml` — the `crabbox:` candy entity and the `crabbox-skill:` skill entity.
+- `charly.yml` — the root `crabbox:` candy entity (the `CRABBOX_COMMIT` /
+  `CRABBOX_CONTAINERD_IMAGE` vars, the `require:` deps, the source `download:` +
+  `go build` plan steps, and the `check:` assertions) and the embedded
+  `crabbox-skill:` skill entity projected into the marketplace corpus as
+  `/charly-tools:crabbox-cli`. Also the root `discover:` block for `candy/` and
+  `box/`.
+- `candy/crabbox-containerd-config/charly.yml` — the separate containerd config
+  candy (`provider: containerd`, `containerd.image`), rendered through the
+  `config:` verb + the `crabbox-yaml` CUE schema.
+- `box/check-crabbox-cli/charly.yml` — the R10 witness: a disposable container
+  running the source-built CLI and asserting the `containerd` provider surface.
+- `.agents/skills/crabbox-cli/SKILL.md` — the owning skill.
 - `.github/workflows/tag-on-merge.yml` — CalVer tag + `CHANGELOG/` on merge.
 - `README.md` — user overview only; never agent guidance.
 
 ## Load these skills first (R0)
 
-- `/charly-tools:crabbox-cli` — the owning skill. The pinned release, the composed
-  prerequisites, and the credential-free local provider surface. Load before
-  editing or troubleshooting the candy.
+- `/charly-tools:crabbox-cli` — the owning skill. The source build, the composed
+  prerequisites, the provider surface, and the config candy.
 - `/charly-image:layer` — the candy authoring reference (`charly.yml` schema,
-  `plan:` step verbs incl. `download:`/`check:`, package sections, service
-  declarations). Load before editing any entity field or plan step.
+  `plan:` step verbs incl. `download:`/`command:`/`config:`, package sections).
+- `/charly-check:check` — the bed/R10 authoring reference.
 
 ## Build / validate / test
 
+- `charly box validate` at the repo root — the structural check (candies, the
+  `plugin:`-less candy surface, the CUE-validated config step, the beds).
+- `charly box build check-crabbox-cli-image` + `charly check box` /
+  `charly check run check-crabbox-cli` — the functional evidence: the binary at
+  `/usr/local/bin/crabbox`, `crabbox --version` reporting the pinned COMMIT,
+  `crabbox providers` listing `containerd`, `providers describe containerd`
+  succeeding, and the rendered config read back by `crabbox config show`.
 - The merge gate is the **org-wide** `charly/pr-validator` (required check
-  `validate / validate`, defined in `opencharly/.github`); this repo has **no
-  per-repo candy gate** and ships only `.github/workflows/tag-on-merge.yml`.
-- The candy's `plan:` `check:` steps are the functional evidence: the binary at
-  `/usr/local/bin/crabbox`, `crabbox --version` reporting the pinned release,
-  `crabbox providers` listing the credential-free matrix, and a broker-less
-  `crabbox doctor` pass. They must stay valid on every distro arm they run on.
-- Keep `CRABBOX_VERSION` in lockstep with the release archive name (the download
-  tag is `v`-prefixed; the asset name is `v`-less).
+  `validate / validate`, defined in `opencharly/.github`); this repo has **no**
+  per-repo candy gate and ships only `.github/workflows/tag-on-merge.yml`.
+- The checks require a Go toolchain that satisfies the pinned source's `go.mod`
+  (layer-golang provides it; `GOTOOLCHAIN=auto` fetches the exact toolchain when the
+  distro's Go is older). A build from the wrong commit fails the version check.
 
 ## Modify this repo
 
 - Edit the `crabbox:` candy entity AND the `crabbox-skill:` skill entity in
-  `charly.yml` together. The skill is the projected usage source, so a version
-  or behaviour change not mirrored in the skill leaves the corpus stale.
+  `charly.yml` together. The skill is the projected usage source, so a version or
+  behaviour change not mirrored in the skill leaves the corpus stale.
 - New behaviour claims belong in the `plan:` as an observable `check:` step, and
   in the skill body.
+- `CRABBOX_COMMIT` is the pin: the source tarball URL and the `-X ...version=`
+  ldflag are the SAME value, so the reported version is always the built commit.
+  Never fall back to a release archive — no `openclaw/crabbox` release carries the
+  `containerd` provider.
+- The config candy is a SEPARATE `candy/` entity on purpose: a consumer that only
+  wants the binary must not silently inherit a `provider:` default. Its ref is by
+  path; the root `crabbox` ref keeps its meaning for every existing consumer.
 
 ## Landing
 

@@ -1,27 +1,55 @@
+discover:
+    - path: candy
+      recursive: true
+    - path: box
+      recursive: true
+
 # layer-crabbox — the Crabbox CLI candy
 #
-# One candy: `crabbox` installs the pinned Crabbox CLI binary and composes the
-# CLI's laptop prerequisites (git/ssh/ssh-keygen/rsync/curl) from sibling
-# candies instead of re-shipping them (R3). Root-entity repo (pod-openclaw
-# shape): entities live at the repo root; no discover: block needed.
+# The root entity `crabbox` BUILDS the CLI from the pinned opencharly/crabbox
+# commit (the fork that carries the `containerd` SSH-lease provider) and composes
+# the CLI's laptop prerequisites (git/ssh/ssh-keygen/rsync/curl) from sibling
+# candies instead of re-shipping them (R3). The separate
+# `candy/crabbox-containerd-config` entity renders the containerd provider
+# selection; `box/check-crabbox-cli` is the R10 witness.
+#
+# Why a source build: the upstream GoReleaser releases under `openclaw/crabbox`
+# can never contain opencharly's W2 provider work, so a 0.79.0 download asserts
+# a CLI that cannot lease on containerd. The build is the SAME recipe the org
+# already uses for a pinned Go source build (`layer-agentteams-cli`): the
+# pinned source tarball, the `layer-golang` toolchain, CGO disabled, the module
+# and build caches mounted. The version string is injected from the pin so the
+# binary reports the exact commit it was built from.
 crabbox:
     candy:
         description: |
             The Crabbox CLI — lease, sync, run, stream, and release remote test
-            execution (https://github.com/openclaw/crabbox). Installs the single
-            static `crabbox` binary from the pinned GoReleaser release archive to
-            /usr/local/bin/crabbox, and composes the CLI's laptop prerequisites
-            instead of re-shipping them (R3): git via layer-gh, ssh/ssh-keygen via
-            layer-ssh-client, plus rsync/curl packages. The observable, verifiable
-            effect — the binary at a fixed path, `crabbox --version` reporting the
-            pinned release, the credential-free `crabbox providers` matrix, and a
-            broker-less `crabbox doctor` pass — is exactly what the plan block
-            asserts; a missing download or a broken binary fails the checks.
+            execution (https://github.com/openclaw/crabbox) — BUILT from the pinned
+            `opencharly/crabbox` commit, which is the only source that carries the
+            `containerd` SSH-lease provider. Installs the single static `crabbox`
+            binary to /usr/local/bin/crabbox, with the pinned commit injected as the
+            reported version (`-X .../internal/cli.version=<commit>`), and composes
+            the CLI's laptop prerequisites instead of re-shipping them (R3): git via
+            layer-gh, ssh/ssh-keygen via layer-ssh-client, plus rsync/curl packages,
+            and the Go toolchain via layer-golang for the build. The observable,
+            verifiable effect — the binary at a fixed path, `crabbox --version`
+            reporting the pinned commit, `crabbox providers` listing the
+            `containerd` provider, `crabbox providers describe containerd`
+            succeeding, and the rendered config read back by `crabbox config show`
+            — is exactly what the plan block asserts; a wrong pin or a broken build
+            fails the checks. `crabbox doctor` is deliberately NOT asserted here: it
+            inspects the LIVE provider's prerequisites (a daemon, a broker), which a
+            build container does not have; the e2e bed's `containerd-preflight` is
+            where a venue's readiness is judged (R8).
         var:
-            CRABBOX_VERSION: "0.79.0"
+            # The merge commit of opencharly/crabbox#7 (W2 seam 1, the containerd
+            # SSH-lease provider). Pinned by commit because the fork has no
+            # tag-on-merge tag for it yet.
+            CRABBOX_COMMIT: "b7b5aaa312fdcd0711b4407935ce4d50117e8155"
         require:
             - '@github.com/opencharly/layer-gh:v2026.272.0136'
             - '@github.com/opencharly/layer-ssh-client:v2026.272.0430'
+            - '@github.com/opencharly/layer-golang:v2026.292.2324'
         package:
             - rsync
             - curl
@@ -29,29 +57,50 @@ crabbox:
             - name: crabbox
               command: crabbox
         plan:
-            - run: download the pinned crabbox release archive and install the single binary to /usr/local/bin
-              download: "https://github.com/openclaw/crabbox/releases/download/v${CRABBOX_VERSION}/crabbox_${CRABBOX_VERSION}_linux_${ARCH}.tar.gz"
+            - run: download the pinned opencharly/crabbox source tree
+              download: "https://github.com/opencharly/crabbox/archive/${CRABBOX_COMMIT}.tar.gz"
               extract: tar.gz
-              to: /usr/local/bin
-              extract_include: [crabbox]
+              strip_components: 1
+              to: /opt/crabbox-src
+              run_as: root
+            - run: build the crabbox CLI from the pinned source with the commit injected as its version
+              command: |
+                  set -e
+                  cd /opt/crabbox-src
+                  # Bounded compile parallelism: the pinned source's dependency graph is large
+                  # (cloud SDKs, Kubernetes, containerd clients). An unbounded `go build` on a
+                  # shared image builder exceeds the builder's memory and its worker is killed
+                  # (MEASURED: buildkit reports `signal: killed` inside this step), so the
+                  # compile is bounded — a resource bound for a reproducible build, not a retry.
+                  CGO_ENABLED=0 GOMAXPROCS=2 GOGC=50 GOFLAGS=-p=2 go build -trimpath \
+                    -ldflags "-s -w -X github.com/openclaw/crabbox/internal/cli.version=${CRABBOX_COMMIT}" \
+                    -o /usr/local/bin/crabbox ./cmd/crabbox
+              cache:
+                  - /root/go/pkg/mod
+                  - /root/.cache/go-build
               run_as: root
             - check: the crabbox CLI binary is installed at /usr/local/bin/crabbox
               file:
                 file: /usr/local/bin/crabbox
                 exists: true
-            - check: crabbox --version reports the pinned 0.79.0 release on stdout
+                filetype: file
+            - check: crabbox --version reports the pinned opencharly/crabbox commit on stdout
               exit_status: 0
               stdout:
-                - matches: "0\\.79\\.0"
+                - matches: "b7b5aaa3"
               command: /usr/local/bin/crabbox --version
-            - check: crabbox providers lists the credential-free local provider matrix
+            - check: crabbox providers lists the containerd SSH-lease provider (absent from every openclaw release)
               exit_status: 0
               stdout:
-                - contains: "local-container"
+                - contains: "containerd"
               command: /usr/local/bin/crabbox providers
-            - check: crabbox doctor passes in a broker-less context (local prerequisites only)
+            - check: crabbox providers describe containerd succeeds and names the provider
+              id: crabbox-describe-containerd
               exit_status: 0
-              command: /usr/local/bin/crabbox doctor
+              stdout:
+                - contains: "containerd"
+              command: /usr/local/bin/crabbox providers describe containerd
+
 crabbox-skill:
     skill:
         name: crabbox-cli
@@ -60,4 +109,5 @@ crabbox-skill:
         triggers:
             - "crabbox CLI / crabbox binary / crabbox version / installing or verifying the CLI"
             - "composing the crabbox CLI candy into a box or choosing its provider surface"
+            - "the crabbox containerd provider / containerd.image lease config / crabbox providers describe containerd"
         category: commands
