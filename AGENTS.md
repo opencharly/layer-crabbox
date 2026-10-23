@@ -6,15 +6,15 @@ and (as a separate candy) the containerd provider config.
 
 Canonical files:
 
-- `charly.yml` — the root `crabbox:` candy entity (the `CRABBOX_COMMIT` /
-  `CRABBOX_CONTAINERD_IMAGE` vars, the `require:` deps, the source `download:` +
-  `go build` plan steps, and the `check:` assertions) and the embedded
-  `crabbox-skill:` skill entity projected into the marketplace corpus as
-  `/charly-tools:crabbox-cli`. Also the root `discover:` block for `candy/` and
-  `box/`.
+- `charly.yml` — the root `crabbox:` candy entity (`CRABBOX_COMMIT`, the
+  `require:` deps, the one fetch+build+discard `command:` step, and the `check:`
+  assertions) and the embedded `crabbox-skill:` skill entity projected into the
+  marketplace corpus as `/charly-tools:crabbox-cli`. Also the root `discover:`
+  block for `candy/` and `box/`.
 - `candy/crabbox-containerd-config/charly.yml` — the separate containerd config
-  candy (`provider: containerd`, `containerd.image`), rendered through the
-  `config:` verb + the `crabbox-yaml` CUE schema.
+  candy (`CRABBOX_CONTAINERD_IMAGE`, `provider: containerd`,
+  `containerd.image`), which `require:`s the `crabbox` candy, rendered through
+  the `config:` verb + the `crabbox-yaml` CUE schema.
 - `box/check-crabbox-cli/charly.yml` — the R10 witness: a disposable container
   running the source-built CLI and asserting the `containerd` provider surface.
 - `.agents/skills/crabbox-cli/SKILL.md` — the owning skill.

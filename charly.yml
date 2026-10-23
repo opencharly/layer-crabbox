@@ -34,10 +34,10 @@ crabbox:
             and the Go toolchain via layer-golang for the build. The observable,
             verifiable effect — the binary at a fixed path, `crabbox --version`
             reporting the pinned commit, `crabbox providers` listing the
-            `containerd` provider, `crabbox providers describe containerd`
-            succeeding, and the rendered config read back by `crabbox config show`
-            — is exactly what the plan block asserts; a wrong pin or a broken build
-            fails the checks. `crabbox doctor` is deliberately NOT asserted here: it
+            `containerd` provider, and `crabbox providers describe containerd`
+            succeeding — is exactly what the plan block asserts; a wrong pin or a
+            broken build fails the checks. The `crabbox-containerd-config` candy
+            carries the `crabbox config show` assertion for the rendered config. `crabbox doctor` is deliberately NOT asserted here: it
             inspects the LIVE provider's prerequisites (a daemon, a broker), which a
             build container does not have; the e2e bed's `containerd-preflight` is
             where a venue's readiness is judged (R8).
@@ -57,16 +57,19 @@ crabbox:
             - name: crabbox
               command: crabbox
         plan:
-            - run: download the pinned opencharly/crabbox source tree
-              download: "https://github.com/opencharly/crabbox/archive/${CRABBOX_COMMIT}.tar.gz"
-              extract: tar.gz
-              strip_components: 1
-              to: /opt/crabbox-src
-              run_as: root
-            - run: build the crabbox CLI from the pinned source with the commit injected as its version
+            # ONE layer: fetch, build, discard. The source tree is a BUILD INPUT, not image
+            # content — the previous two-step shape (download: to /opt + build) left the whole
+            # tree in the final image, and the layer diff for it is what exhausted the shared
+            # builder's memory. The trap removes the tree inside this same RUN, so no layer
+            # carries it; the Go module/build caches remain cache mounts, never image content.
+            - run: fetch the pinned source, build the CLI with the commit injected as its version, and discard the tree
               command: |
                   set -e
-                  cd /opt/crabbox-src
+                  tmp="$(mktemp -d)"
+                  trap 'rm -rf "$tmp"' EXIT
+                  curl -fsSL "https://github.com/opencharly/crabbox/archive/${CRABBOX_COMMIT}.tar.gz" -o "$tmp/src.tgz"
+                  tar -xzf "$tmp/src.tgz" -C "$tmp" --strip-components=1
+                  cd "$tmp"
                   # Bounded compile parallelism: the pinned source's dependency graph is large
                   # (cloud SDKs, Kubernetes, containerd clients). An unbounded `go build` on a
                   # shared image builder exceeds the builder's memory and its worker is killed

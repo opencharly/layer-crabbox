@@ -24,6 +24,10 @@ crabbox-containerd-config:
             lease with that exact ref rather than an ambient default.
         var:
             CRABBOX_CONTAINERD_IMAGE: "ghcr.io/opencharly/pod-crabbox:2026.293.1655"
+        # The check runs the CLI, so the CLI is a real dependency edge — composing this
+        # candy alone must not fail for a missing binary (the bed composing both hid it).
+        require:
+            - crabbox
         plan:
             - run: render the crabbox user config selecting the containerd provider and its lease image
               config: "${HOME}/.config/crabbox/config.yaml"

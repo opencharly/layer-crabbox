@@ -33,14 +33,15 @@ the binary names its own source.
 
 ## How to use it
 
-Compose the layer by pinning this repo in a box's `candy:` list:
+Compose the layer by pinning this repo in a box's `candy:` list (use the CalVer
+tag minted when this repo merges; `main` below is the pre-tag form):
 
 ```yaml
 my-box:
   candy:
     base: fedora
     candy:
-      - '@github.com/opencharly/layer-crabbox:v2026.293.1705'
+      - '@github.com/opencharly/layer-crabbox:main'
 ```
 
 Select the containerd provider with the separate config candy (by path, so the
@@ -48,7 +49,7 @@ root `crabbox` ref keeps its meaning):
 
 ```yaml
     candy:
-      - '@github.com/opencharly/layer-crabbox/candy/crabbox-containerd-config:v2026.293.1705'
+      - '@github.com/opencharly/layer-crabbox/candy/crabbox-containerd-config:main'
 ```
 
 Then, inside the built image (or on a dev host via the `charly alias` wrapper):
@@ -62,13 +63,14 @@ crabbox config show                 # provider=containerd image=<lease image>
 
 ## Verification
 
-The candy's `plan:` asserts the binary at the fixed path, `crabbox --version`
-reporting the pinned commit, `crabbox providers` listing `containerd`,
-`crabbox providers describe containerd` succeeding, and the rendered config read
-back by `crabbox config show`. `crabbox doctor` is not asserted at image time — it
-judges a LIVE venue's provider prerequisites, which a build container does not
-have. The repo's R10 bed `check-crabbox-cli` runs the surface in a disposable
-container.
+The CLI candy's `plan:` asserts the binary at the fixed path, `crabbox --version`
+reporting the pinned commit, `crabbox providers` listing `containerd`, and
+`crabbox providers describe containerd` succeeding. The `crabbox-containerd-config`
+candy separately asserts that its rendered file is read back by
+`crabbox config show` with `provider=containerd` and the lease image.
+`crabbox doctor` is not asserted at image time — it judges a LIVE venue's provider
+prerequisites, which a build container does not have. The repo's R10 bed
+`check-crabbox-cli` runs the whole surface in a disposable container.
 
 ## Layout
 
