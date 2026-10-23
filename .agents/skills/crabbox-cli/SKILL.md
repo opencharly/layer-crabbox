@@ -16,7 +16,7 @@ description: 'The Crabbox CLI candy — remote software testing and execution co
 | Binary | `/usr/local/bin/crabbox` |
 | Source | pinned `opencharly/crabbox` COMMIT (`CRABBOX_COMMIT` var), built with `go build -trimpath ./cmd/crabbox` |
 | Version | the pinned commit, injected with `-X github.com/openclaw/crabbox/internal/cli.version=<commit>` |
-| Install | `download:` the commit's source tarball → `go build` (CGO disabled) |
+| Install | ONE `command:` step: curl the commit's tarball → extract → `go build` (CGO disabled) → discard the tree in the same RUN |
 | Requires | `layer-golang` (the Go toolchain), `layer-gh` (git), `layer-ssh-client` (ssh/ssh-keygen), rsync + curl packages |
 | Alias | `crabbox` (wrapper runs in-box via `charly alias`) |
 | Config sibling | `candy/crabbox-containerd-config` — `provider: containerd` + `containerd.image` |
@@ -24,7 +24,9 @@ description: 'The Crabbox CLI candy — remote software testing and execution co
 ## What it installs
 
 A single static Go binary BUILT from the `opencharly/crabbox` commit pinned in
-`CRABBOX_COMMIT`. The source build is not an optimization: no `openclaw/crabbox`
+`CRABBOX_COMMIT`. The fetch and the build are ONE `command:` step: the tarball is
+downloaded, extracted to a temp dir, compiled, and the temp dir is removed by a
+`trap` in the same RUN — the source never becomes image content. The source build is not an optimization: no `openclaw/crabbox`
 release carries the `containerd` SSH-lease provider, so a downloaded 0.79.0
 asserts a CLI that cannot lease on containerd. The version string IS the commit,
 so `crabbox --version` names the source the binary came from. Prerequisites for

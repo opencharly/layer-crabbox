@@ -26,7 +26,7 @@ Canonical files:
 - `/charly-tools:crabbox-cli` — the owning skill. The source build, the composed
   prerequisites, the provider surface, and the config candy.
 - `/charly-image:layer` — the candy authoring reference (`charly.yml` schema,
-  `plan:` step verbs incl. `download:`/`command:`/`config:`, package sections).
+  `plan:` step verbs incl. `command:`/`config:`, package sections).
 - `/charly-check:check` — the bed/R10 authoring reference.
 
 ## Build / validate / test

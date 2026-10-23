@@ -74,8 +74,9 @@ prerequisites, which a build container does not have. The repo's R10 bed
 
 ## Layout
 
-- `charly.yml` — the `crabbox:` candy entity (the pin vars, the `require:` deps,
-  the source `download:`/`go build` plan, the `check:` assertions), the root
+- `charly.yml` — the `crabbox:` candy entity (`CRABBOX_COMMIT`, the `require:`
+  deps, the ONE fetch+build+discard `command:` step (curl → tar → `go build`,
+  source removed in the same RUN), the `check:` assertions), the root
   `discover:` block, and the embedded `crabbox-skill:` skill entity.
 - `candy/crabbox-containerd-config/charly.yml` — the containerd config candy.
 - `box/check-crabbox-cli/charly.yml` — the R10 witness.
