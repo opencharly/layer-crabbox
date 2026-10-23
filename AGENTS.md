@@ -6,11 +6,11 @@ and (as a separate candy) the containerd provider config.
 
 Canonical files:
 
-- `charly.yml` — the root `crabbox:` candy entity (`CRABBOX_COMMIT`, the
+- `charly.yml` — the root `layer-crabbox:` candy entity (`CRABBOX_COMMIT`, the
   `require:` deps, the one fetch+build+discard `command:` step, and the `check:`
   assertions) and the embedded `crabbox-skill:` skill entity projected into the
   marketplace corpus as `/charly-tools:crabbox-cli`. Also the root `discover:`
-  block for `candy/` and `box/`.
+  block for `crabbox-containerd-config/` and `box/`.
 - `crabbox-containerd-config/charly.yml` — the separate containerd config
   candy (`CRABBOX_CONTAINERD_IMAGE`, `provider: containerd`,
   `containerd.image`), which `require:`s the `crabbox` candy, rendered through
@@ -47,7 +47,7 @@ Canonical files:
 
 ## Modify this repo
 
-- Edit the `crabbox:` candy entity AND the `crabbox-skill:` skill entity in
+- Edit the `layer-crabbox:` candy entity AND the `crabbox-skill:` skill entity in
   `charly.yml` together. The skill is the projected usage source, so a version or
   behaviour change not mirrored in the skill leaves the corpus stale.
 - New behaviour claims belong in the `plan:` as an observable `check:` step, and
@@ -56,7 +56,7 @@ Canonical files:
   ldflag are the SAME value, so the reported version is always the built commit.
   Never fall back to a release archive — no `openclaw/crabbox` release carries the
   `containerd` provider.
-- The config candy is a SEPARATE `candy/` entity on purpose: a consumer that only
+- The config candy is a SEPARATE entity on purpose: a consumer that only
   wants the binary must not silently inherit a `provider:` default. Its ref is by
   path; the root `crabbox` ref keeps its meaning for every existing consumer.
 

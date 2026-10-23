@@ -44,8 +44,9 @@ my-box:
       - '@github.com/opencharly/layer-crabbox:main'
 ```
 
-Select the containerd provider with the separate config candy (by path, so the
-root `crabbox` ref keeps its meaning):
+Select the containerd provider with the separate config candy (by path; the root
+ref's STRING is unchanged, but the resolved candy is now named `layer-crabbox`, so
+a consumer that composes it by NAME follows the rename):
 
 ```yaml
     candy:
@@ -74,7 +75,7 @@ prerequisites, which a build container does not have. The repo's R10 bed
 
 ## Layout
 
-- `charly.yml` — the `crabbox:` candy entity (`CRABBOX_COMMIT`, the `require:`
+- `charly.yml` — the `layer-crabbox:` candy entity (`CRABBOX_COMMIT`, the `require:`
   deps, the ONE fetch+build+discard `command:` step (curl → tar → `go build`,
   source removed in the same RUN), the `check:` assertions), the root
   `discover:` block, and the embedded `crabbox-skill:` skill entity.

@@ -1,13 +1,11 @@
-# `path: "."` keeps the ROOT manifest in the discovered set: without it, a remote
-# `@github.com/opencharly/layer-crabbox:<tag>` fetch loads ONLY candy/ and box/,
-# so the root `crabbox` candy is absent and every consumer's candy order fails
-# "unknown candy github.com/opencharly/layer-crabbox" (MEASURED on v2026.296.1108).
 # NO `candy/` directory at this repo root, deliberately: a repo carrying candy/
 # is scanned as a PROJECT (candies keyed `repo/candy/<name>`), so a remote
 # `@github.com/opencharly/layer-crabbox:<tag>` ref would never resolve the ROOT
-# candy. Without candy/, the root manifest is scanned as the single candy named
-# after the repo (`layer-crabbox`). The separate config candy lives in its own
-# named directory and is referenced by path
+# candy and every consumer failed "unknown candy github.com/opencharly/layer-crabbox"
+# (MEASURED on v2026.296.1108). Without candy/, the root manifest is scanned as
+# the single candy named after the repo (`layer-crabbox`). The root manifest is
+# the project's OWN file, so no `path: "."` is needed; the separate config candy
+# lives in its own named directory and is referenced by path
 # (`@.../layer-crabbox/crabbox-containerd-config:<tag>`).
 discover:
     - path: crabbox-containerd-config
@@ -17,7 +15,7 @@ discover:
 
 # layer-crabbox — the Crabbox CLI candy
 #
-# The root entity `crabbox` BUILDS the CLI from the pinned opencharly/crabbox
+# The root entity `layer-crabbox` BUILDS the CLI from the pinned opencharly/crabbox
 # commit (the fork that carries the `containerd` SSH-lease provider) and composes
 # the CLI's laptop prerequisites (git/ssh/ssh-keygen/rsync/curl) from sibling
 # candies instead of re-shipping them (R3). The separate

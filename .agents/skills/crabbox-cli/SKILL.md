@@ -64,8 +64,9 @@ setting changes between acquisitions.
 ## The containerd config candy
 
 `crabbox-containerd-config` is a SEPARATE candy, referenced by path
-(`@github.com/opencharly/layer-crabbox/crabbox-containerd-config:<tag>`), so
-the root `crabbox` ref keeps its meaning for existing consumers. It renders
+(`@github.com/opencharly/layer-crabbox/crabbox-containerd-config:<tag>`). The root
+ref's STRING is unchanged, but the resolved candy is named `layer-crabbox` (the
+ref leaf), so a consumer that composes it by NAME follows the rename. It renders
 `~/.config/crabbox/config.yaml` through the `config:` verb, validated against
 plugin-egress's `crabbox-yaml` schema:
 
