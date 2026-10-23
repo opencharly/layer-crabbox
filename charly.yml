@@ -26,7 +26,7 @@ discover:
 # pinned source tarball, the `layer-golang` toolchain, CGO disabled, the module
 # and build caches mounted. The version string is injected from the pin so the
 # binary reports the exact commit it was built from.
-crabbox:
+layer-crabbox:
     candy:
         description: |
             The Crabbox CLI — lease, sync, run, stream, and release remote test
@@ -114,7 +114,7 @@ crabbox-skill:
     skill:
         name: crabbox-cli
         family: tools
-        owner: crabbox
+        owner: layer-crabbox
         triggers:
             - "crabbox CLI / crabbox binary / crabbox version / installing or verifying the CLI"
             - "composing the crabbox CLI candy into a box or choosing its provider surface"

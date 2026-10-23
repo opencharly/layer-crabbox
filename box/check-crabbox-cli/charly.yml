@@ -14,7 +14,7 @@ check-crabbox-cli-image:
         platform:
             - linux/amd64
         candy:
-            - crabbox
+            - layer-crabbox
             - crabbox-containerd-config
 
 check-crabbox-cli:
