@@ -1,0 +1,59 @@
+# The R10 witness for the layer: the CLI BUILT from the pinned opencharly/crabbox
+# commit, in a disposable container, asserting the provider surface that the
+# openclaw release can never carry. No lease is created here — a lease needs a
+# containerd host and a published lease image (W5), and those belong to the
+# `check-crabbox-containerd-e2e` bed in plugin-crabbox. This bed proves the
+# BUILD: the binary reports the commit, the provider catalogue and the describe
+# output name `containerd`, and the rendered config is parsed back by the CLI.
+check-crabbox-cli-image:
+    candy:
+        description: The crabbox CLI built from the pinned opencharly/crabbox commit, plus its containerd config candy.
+        distro: [fedora]
+        build: [rpm]
+        base: quay.io/fedora/fedora:43
+        platform:
+            - linux/amd64
+        candy:
+            - crabbox
+            - crabbox-containerd-config
+
+check-crabbox-cli:
+    pod:
+        image: check-crabbox-cli-image
+        disposable: true
+        lifecycle: test
+        description: >-
+            A disposable container running the SOURCE-BUILT crabbox CLI: the version
+            is the pinned opencharly/crabbox commit (not a released 0.79.0), the
+            provider catalogue lists `containerd`, `providers describe containerd`
+            succeeds as an ssh-lease provider, and the config candy's rendered
+            `~/.config/crabbox/config.yaml` is read back by `crabbox config show`
+            with the containerd provider and the lease image selected. A build from
+            the wrong source, or a config the CLI rejects, fails these steps.
+        plan:
+            - check: crabbox --version reports the pinned opencharly/crabbox commit, not a released tag
+              id: crabbox-source-version
+              exit_status: 0
+              stdout:
+                - matches: "b7b5aaa312fdcd0711b4407935ce4d50117e8155"
+              command: /usr/local/bin/crabbox --version
+            - check: the provider catalogue lists the containerd SSH-lease provider
+              id: crabbox-providers-containerd
+              exit_status: 0
+              stdout:
+                - contains: "containerd"
+              command: /usr/local/bin/crabbox providers
+            - check: providers describe containerd succeeds and reports an ssh-lease provider
+              id: crabbox-describe-containerd
+              exit_status: 0
+              stdout:
+                - contains: "containerd"
+                - contains: "ssh-lease"
+              command: /usr/local/bin/crabbox providers describe containerd
+            - check: the rendered config selects the containerd provider and the lease image
+              id: crabbox-config-containerd
+              exit_status: 0
+              stdout:
+                - contains: "provider=containerd"
+                - contains: "image=ghcr.io/opencharly/pod-crabbox:2026.293.1655"
+              command: /usr/local/bin/crabbox config show
