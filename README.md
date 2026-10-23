@@ -49,7 +49,7 @@ root `crabbox` ref keeps its meaning):
 
 ```yaml
     candy:
-      - '@github.com/opencharly/layer-crabbox/candy/crabbox-containerd-config:main'
+      - '@github.com/opencharly/layer-crabbox/crabbox-containerd-config:main'
 ```
 
 Then, inside the built image (or on a dev host via the `charly alias` wrapper):
@@ -78,7 +78,7 @@ prerequisites, which a build container does not have. The repo's R10 bed
   deps, the ONE fetch+build+discard `command:` step (curl → tar → `go build`,
   source removed in the same RUN), the `check:` assertions), the root
   `discover:` block, and the embedded `crabbox-skill:` skill entity.
-- `candy/crabbox-containerd-config/charly.yml` — the containerd config candy.
+- `crabbox-containerd-config/charly.yml` — the containerd config candy.
 - `box/check-crabbox-cli/charly.yml` — the R10 witness.
 - `.github/workflows/tag-on-merge.yml` — CalVer tag + `CHANGELOG/` on merge.
 - `README.md` — this user overview.

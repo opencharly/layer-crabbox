@@ -2,10 +2,15 @@
 # `@github.com/opencharly/layer-crabbox:<tag>` fetch loads ONLY candy/ and box/,
 # so the root `crabbox` candy is absent and every consumer's candy order fails
 # "unknown candy github.com/opencharly/layer-crabbox" (MEASURED on v2026.296.1108).
+# NO `candy/` directory at this repo root, deliberately: a repo carrying candy/
+# is scanned as a PROJECT (candies keyed `repo/candy/<name>`), so a remote
+# `@github.com/opencharly/layer-crabbox:<tag>` ref would never resolve the ROOT
+# candy. Without candy/, the root manifest is scanned as the single candy named
+# after the repo (`layer-crabbox`). The separate config candy lives in its own
+# named directory and is referenced by path
+# (`@.../layer-crabbox/crabbox-containerd-config:<tag>`).
 discover:
-    - path: "."
-      recursive: true
-    - path: candy
+    - path: crabbox-containerd-config
       recursive: true
     - path: box
       recursive: true
@@ -16,7 +21,7 @@ discover:
 # commit (the fork that carries the `containerd` SSH-lease provider) and composes
 # the CLI's laptop prerequisites (git/ssh/ssh-keygen/rsync/curl) from sibling
 # candies instead of re-shipping them (R3). The separate
-# `candy/crabbox-containerd-config` entity renders the containerd provider
+# `crabbox-containerd-config` entity renders the containerd provider
 # selection; `box/check-crabbox-cli` is the R10 witness.
 #
 # Why a source build: the upstream GoReleaser releases under `openclaw/crabbox`

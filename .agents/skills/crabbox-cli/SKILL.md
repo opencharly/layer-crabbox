@@ -19,7 +19,7 @@ description: 'The Crabbox CLI candy — remote software testing and execution co
 | Install | ONE `command:` step: curl the commit's tarball → extract → `go build` (CGO disabled) → discard the tree in the same RUN |
 | Requires | `layer-golang` (the Go toolchain), `layer-gh` (git), `layer-ssh-client` (ssh/ssh-keygen), rsync + curl packages |
 | Alias | `crabbox` (wrapper runs in-box via `charly alias`) |
-| Config sibling | `candy/crabbox-containerd-config` — `provider: containerd` + `containerd.image` |
+| Config sibling | `crabbox-containerd-config` — `provider: containerd` + `containerd.image` |
 
 ## What it installs
 
@@ -63,8 +63,8 @@ setting changes between acquisitions.
 
 ## The containerd config candy
 
-`candy/crabbox-containerd-config` is a SEPARATE candy, referenced by path
-(`@github.com/opencharly/layer-crabbox/candy/crabbox-containerd-config:<tag>`), so
+`crabbox-containerd-config` is a SEPARATE candy, referenced by path
+(`@github.com/opencharly/layer-crabbox/crabbox-containerd-config:<tag>`), so
 the root `crabbox` ref keeps its meaning for existing consumers. It renders
 `~/.config/crabbox/config.yaml` through the `config:` verb, validated against
 plugin-egress's `crabbox-yaml` schema:

@@ -11,7 +11,7 @@ Canonical files:
   assertions) and the embedded `crabbox-skill:` skill entity projected into the
   marketplace corpus as `/charly-tools:crabbox-cli`. Also the root `discover:`
   block for `candy/` and `box/`.
-- `candy/crabbox-containerd-config/charly.yml` — the separate containerd config
+- `crabbox-containerd-config/charly.yml` — the separate containerd config
   candy (`CRABBOX_CONTAINERD_IMAGE`, `provider: containerd`,
   `containerd.image`), which `require:`s the `crabbox` candy, rendered through
   the `config:` verb + the `crabbox-yaml` CUE schema.
